@@ -1,0 +1,1 @@
+{'corr_threshold':[0.6,0.7,0.8,0.9],'test_size':[0.2,0.3,0.9],'estimator_name':['RandomForestClassifier','LogisticRegression','GaussianNB','KNeighborsClassifier','DecisionTreeClassifier']}
