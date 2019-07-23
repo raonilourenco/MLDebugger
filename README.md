@@ -28,7 +28,11 @@ To install latest development version:
     
 ## 2. How to Run
 
-To run our example:
+To run our example with a machine learning pipeline written in VisTrail, first you need to start a worker:
+
+    $ worker &
+
+Then run the executable passing the pipeline path and property-value search space:
 
     $ mldebugger examples/classification_pipeline.vt examples/params.json
 
