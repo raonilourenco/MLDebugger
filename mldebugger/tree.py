@@ -6,6 +6,10 @@ from PIL import Image, ImageDraw
 
 
 def unique_counts(rows):
+    """
+    :param rows:
+    :return:
+    """
     results = {}
     for row in rows:
         # The result is the last column
@@ -16,6 +20,10 @@ def unique_counts(rows):
 
 
 def unique_counts_dd(rows):
+    """
+    :param rows:
+    :return:
+    """
     results = collections.defaultdict(lambda: 0)
     for row in rows:
         r = row[len(row) - 1]
@@ -26,6 +34,10 @@ def unique_counts_dd(rows):
 # Entropy is the sum of p(x)log(p(x)) across all the different possible results
 
 def entropy(rows):
+    """
+    :param rows:
+    :return:
+    """
     from math import log
     log2 = lambda x: log(x) / log(2)
     results = unique_counts(rows)
@@ -40,6 +52,9 @@ def entropy(rows):
 
 
 class DecisionNode:
+    """
+
+    """
     def __init__(self, col=-1, cols=[], value=None, best_gain=None, results=None, tb=None, fb=None, parent=None):
         self.col = col  # column index of criteria being tested
         self.best_gain = best_gain
@@ -52,6 +67,9 @@ class DecisionNode:
 
 
 class Stats:
+    """
+
+    """
     leaf_nodes = 0
     pure_nodes = 0
 
@@ -59,6 +77,10 @@ class Stats:
         self.leaf_nodes = self.count_leaf(tree)
 
     def count_leaf(self, tree):
+        """
+        :param tree:
+        :return:
+        """
         if not tree:
             return 0
         if not tree.fb and not tree.tb:
@@ -76,6 +98,12 @@ def __init__(self, t_set, cols):
 
 # Divides a set on a specific column. Can handle numeric or nominal values
 def divide_set(rows, column, value):
+    """
+    :param rows:
+    :param column:
+    :param value:
+    :return:
+    """
     # for numerical values
     if isinstance(value, int) or isinstance(value, float):
         split_function = lambda row: row[column] >= value
@@ -91,12 +119,25 @@ def divide_set(rows, column, value):
 
 
 # **Caveats:**
-# Information gain is generally a good measure for deciding the relevance of an attribute, but there are some distinct shortcomings. One case is when information gain is applied to variabless that take on a large number of unique values. This is a concern not necessarily from a pure variance perspective, rather that the variable is too descriptive of the current observations.
+# Information gain is generally a good measure for deciding the relevance of an attribute,
+# but there are some distinct shortcomings. One case is when information gain is applied to
+# variabless that take on a large number of unique values. This is a concern not necessarily
+# from a pure variance perspective, rather that the variable is too descriptive of the current observations.
 #
-# **High mutual information** indicates a large reduction in uncertainty, credit card numbers or street addresss variables in a dataset uniquely identify a customer. These variables provide a great deal of identifying information if we are trying to predict a customer, but will not generalize well to unobserved/trained-on instances (overfitting).
+# **High mutual information** indicates a large reduction in uncertainty,
+# credit card numbers or street addresss variables in a dataset uniquely identify a customer.
+# These variables provide a great deal of identifying information if we are trying to predict a customer, but will not
+# generalize well to unobserved/trained-on instances (overfitting).
 
 
 def build(rows, score_fun=entropy, cols=None, parent=None):
+    """
+    :param rows:
+    :param score_fun:
+    :param cols:
+    :param parent:
+    :return:
+    """
     if len(rows) == 0:
         return DecisionNode()
 
@@ -135,6 +176,11 @@ def build(rows, score_fun=entropy, cols=None, parent=None):
 # We now have a function that returns a trained decision tree. We can print a rudimentary tree.
 
 def print_tree(tree, indent=''):
+    """
+    :param tree:
+    :param indent:
+    :return:
+    """
     # Is this a leaf node?
     if tree.results is not None:
         print str(tree.results)
@@ -151,18 +197,31 @@ def print_tree(tree, indent=''):
 
 # printing stuff
 def get_width(tree):
+    """
+    :param tree:
+    :return:
+    """
     if tree.tb is None and tree.fb is None:
         return 1
     return get_width(tree.tb) + get_width(tree.fb)
 
 
 def get_depth(tree):
+    """
+    :param tree:
+    :return:
+    """
     if tree.tb is None and tree.fb is None:
         return 0
     return max(get_depth(tree.tb), get_depth(tree.fb)) + 1
 
 
 def draw_tree(tree, jpeg='tree.jpg'):
+    """
+    :param tree:
+    :param jpeg:
+    :return:
+    """
     w = get_width(tree) * 100
     h = get_depth(tree) * 100 + 120
 
@@ -176,6 +235,13 @@ def draw_tree(tree, jpeg='tree.jpg'):
 
 
 def draw_node(draw, tree, x, y):
+    """
+    :param draw:
+    :param tree:
+    :param x:
+    :param y:
+    :return:
+    """
     if tree.results is None:
         # Get the width of each branch
         w1 = get_width(tree.fb) * 100
@@ -202,9 +268,15 @@ def draw_node(draw, tree, x, y):
         draw.text((x - 20, y), txt, (0, 0, 0))
 
 
-# Now that we have built our tree, we can feed new observations and classify them. The following code basically do what we could do manually by using the tree and answering the questions.
+# Now that we have built our tree, we can feed new observations and classify them.
+# The following code basically do what we could do manually by using the tree and answering the questions.
 
 def classify(observation, tree):
+    """
+    :param observation:
+    :param tree:
+    :return:
+    """
     if tree.results is not None:
         return tree.results
     else:
@@ -223,6 +295,12 @@ def classify(observation, tree):
 
 
 def precision(df, tree, n=100):
+    """
+    :param df:
+    :param tree:
+    :param n:
+    :return:
+    """
     import pyprind
     bar = pyprind.ProgBar(n, track_time=True, stream=1)
     p = 0

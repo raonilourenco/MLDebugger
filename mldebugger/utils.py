@@ -243,9 +243,4 @@ def record_python_run(paramDict, vistrail_name, origin=None):
     f = open(file_name, "a")
     f.write(json.dumps(paramDict) + '\n')
     f.close()
-
-# input_dict = {'p1':['p11','p12','p13'],'p2':['p21','p22','p23'],'p3':['p31','p32','p33'],'p4':['p41','p42','p43']}
-# permutations = load_permutations(input_dict)
-# print('permutations',len(permutations))
-# for permutation in permutations:
-#    print(permutation)
+    print(permutation)

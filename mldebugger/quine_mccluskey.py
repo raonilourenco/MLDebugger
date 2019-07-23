@@ -49,7 +49,12 @@ import numpy as np
 
 
 # compare two binary strings, check where there is one difference
-def compBinary(s1, s2):
+def comp_binary(s1, s2):
+    """
+    :param s1:
+    :param s2:
+    :return:
+    """
     found_one = False
     pos = None
     for i in range(len(s1)):
@@ -64,7 +69,12 @@ def compBinary(s1, s2):
 
 # compare if the number is same as implicant term
 # s1 should be the term
-def compBinarySame(term, number):
+def comp_binary_same(term, number):
+    """
+    :param term:
+    :param number:
+    :return:
+    """
     for i in range(len(term)):
         if term[i] != '-':
             if term[i] != number[i]:
@@ -74,7 +84,12 @@ def compBinarySame(term, number):
 
 
 # combine pairs and make new group
-def combinePairs(group, unchecked):
+def combine_pairs(group, unchecked):
+    """
+    :param group:
+    :param unchecked:
+    :return:
+    """
     # define length
     keys = group.keys()
     l = len(keys) - 1
@@ -88,7 +103,7 @@ def combinePairs(group, unchecked):
         for elem1 in group[keys[i]]:
             # next selected group
             for elem2 in group[keys[i + 1]]:
-                b, pos = compBinary(elem1, elem2)
+                b, pos = comp_binary(elem1, elem2)
                 if b == True:
                     if keys[i] not in next_group:
                         next_group[keys[i]] = set()
@@ -105,6 +120,10 @@ def combinePairs(group, unchecked):
 
 # remove redundant lists in 2d list
 def remove_redundant(group):
+    """
+    :param group:
+    :return:
+    """
     new_group = []
     for j in group:
         new = []
@@ -117,6 +136,10 @@ def remove_redundant(group):
 
 # remove redundant in 1d list
 def remove_redundant_list(list):
+    """
+    :param list:
+    :return:
+    """
     new_list = []
     for i in list:
         if i not in new_list:
@@ -126,18 +149,26 @@ def remove_redundant_list(list):
 
 # return True if empty
 def check_empty(group):
+    """
+    :param group:
+    :return:
+    """
     return len(group) == 0
 
 
 # find essential prime implicants ( col num of ones = 1)
-def find_prime(Chart):
+def find_prime(chart):
+    """
+    :param chart:
+    :return:
+    """
     prime = []
-    for col in range(len(Chart[0])):
+    for col in range(len(chart[0])):
         count = 0
         pos = 0
-        for row in range(len(Chart)):
+        for row in range(len(chart)):
             # find essential
-            if Chart[row][col] == 1:
+            if chart[row][col] == 1:
                 count += 1
                 pos = row
 
@@ -147,17 +178,30 @@ def find_prime(Chart):
     return prime
 
 
-def check_all_zero(Chart):
-    return np.sum(Chart) == 0
+def check_all_zero(chart):
+    """
+    :param chart:
+    :return:
+    """
+    return np.sum(chart) == 0
 
 
 # find max value in list
 def find_max(l):
+    """
+    :param l:
+    :return:
+    """
     return np.argmax(l)
 
 
 # multiply two terms (ex. (p1 + p2)(p1+p4+p5) )..it returns the product
 def multiplication(list1, list2):
+    """
+    :param list1:
+    :param list2:
+    :return:
+    """
     list_result = []
     # if empty
     if len(list1) == 0 and len(list2) == 0:
@@ -187,24 +231,28 @@ def multiplication(list1, list2):
 
 
 # petrick's method
-def petrick_method(Chart):
-    # initial P
-    P = []
-    for col in range(len(Chart[0])):
+def petrick_method(chart):
+    """
+        :param chart:
+    :return:
+    """
+    # initial petrick
+    petrick = []
+    for col in range(len(chart[0])):
         p = []
-        for row in range(len(Chart)):
-            if Chart[row][col] == 1:
+        for row in range(len(chart)):
+            if chart[row][col] == 1:
                 p.append([row])
-        P.append(p)
+        petrick.append(p)
     # do multiplication
-    for l in range(len(P) - 1):
-        P[l + 1] = multiplication(P[l], P[l + 1])
+    for l in range(len(petrick) - 1):
+        petrick[l + 1] = multiplication(petrick[l], petrick[l + 1])
 
-    P = sorted(P[len(P) - 1], key=len)
+    petrick = sorted(petrick[len(petrick) - 1], key=len)
     final = []
     # find the terms with min length = this is the one with lowest cost (optimized result)
-    min = len(P[0])
-    for i in P:
+    min = len(petrick[0])
+    for i in petrick:
         if len(i) == min:
             final.append(i)
         else:
@@ -213,21 +261,25 @@ def petrick_method(Chart):
     return final
 
 
-def ga(Chart):
+def ga(chart):
+    """
+    :param chart:
+    :return:
+    """
     alpha = {}
     beta = {}
     S = set()
-    U = set(range(len(Chart)))
+    U = set(range(len(chart)))
     w = {}
     # initialization
-    for col in range(len(Chart[0])):
+    for col in range(len(chart[0])):
         if col not in beta:
             beta[col] = set()
-        for row in range(len(Chart)):
+        for row in range(len(chart)):
             if row not in alpha:
                 alpha[row] = set()
                 w[row] = 0
-            if Chart[row][col] == 1:
+            if chart[row][col] == 1:
                 beta[col].add(row)
                 alpha[row].add(col)
                 S.add(col)
@@ -263,40 +315,48 @@ def ga(Chart):
 
 
 # chart = n*n list
-def find_minimum_cost(Chart, unchecked):
-    P_final = []
+def find_minimum_cost(chart):
+    """
+    :param chart:
+    :return:
+    """
+    p_final = []
     # essential_prime = list with terms with only one 1 (Essential Prime Implicants)
-    essential_prime = find_prime(Chart)
+    essential_prime = find_prime(chart)
     essential_prime = remove_redundant_list(essential_prime)
 
     # modifiy the chart to exclude the covered terms
     for i in range(len(essential_prime)):
-        for col in range(len(Chart[0])):
-            if Chart[essential_prime[i]][col] == 1:
-                for row in range(len(Chart)):
-                    Chart[row][col] = 0
+        for col in range(len(chart[0])):
+            if chart[essential_prime[i]][col] == 1:
+                for row in range(len(chart)):
+                    chart[row][col] = 0
 
     # if all zero, no need for petrick method
-    if check_all_zero(Chart) == True:
-        P_final = [essential_prime]
+    if check_all_zero(chart) == True:
+        p_final = [essential_prime]
     else:
-        P = ga(Chart)
+        P = ga(chart)
         # Replacing petrick_method by GA
         # TODO reference
 
-        P_final.append(P)
+        p_final.append(P)
 
         # append prime implicants to the solution of Petrick's method
-        for i in P_final:
+        for i in p_final:
             for j in essential_prime:
                 if j not in i:
                     i.append(j)
 
-    return P_final
+    return p_final
 
 
 # calculate the number of literals
 def cal_efficient(s):
+    """
+    :param s:
+    :return:
+    """
     count = 0
     for i in range(len(s)):
         if s[i] != '-':
@@ -306,7 +366,12 @@ def cal_efficient(s):
 
 
 # main function
-def reduce(n_var, minterms):
+def reduce_terms(n_var, minterms):
+    """
+    :param n_var:
+    :param minterms:
+    :return:
+    """
     a = minterms
     # put the numbers in list in int form
     a = map(int, a)
@@ -336,18 +401,18 @@ def reduce(n_var, minterms):
     # combine the pairs in series until nothing new can be combined
     count = 0
     while check_empty(group) == False:
-        group, unchecked = combinePairs(group, unchecked)
+        group, unchecked = combine_pairs(group, unchecked)
     # make the prime implicant chart
-    # Chart = [[0 for x in range(len(a))] for x in range(len(unchecked))]
+    # chart = [[0 for x in range(len(a))] for x in range(len(unchecked))]
     unchecked = list(unchecked)
-    Chart = np.zeros((len(unchecked), len(a)), dtype=int)
+    chart = np.zeros((len(unchecked), len(a)), dtype=int)
     for i in range(len(a)):
         for j in range(len(unchecked)):
             # term is same as number
-            if compBinarySame(unchecked[j], a[i]):
-                Chart[j][i] = 1
+            if comp_binary_same(unchecked[j], a[i]):
+                chart[j][i] = 1
 
-    primes = find_minimum_cost(Chart, unchecked)
+    primes = find_minimum_cost(chart)
     primes = remove_redundant(primes)
 
     s = []

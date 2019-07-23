@@ -3,11 +3,16 @@ import ast
 import itertools
 import Queue
 import mldebugger.tree as _tree
-from mldebugger.quine_mccluskey import reduce
+from mldebugger.quine_mccluskey import reduce_terms
 from mldebugger.autodebug_trees import AutoDebug
 
 
-def findallpaths(node, keys):
+def find_all_paths(node, keys):
+    """
+    :param node:
+    :param keys:
+    :return:
+    """
     q = Queue.Queue()
     q.put((node, []))
     puregoodpaths = []
@@ -37,6 +42,11 @@ def findallpaths(node, keys):
 
 
 def from_paths_to_binary(paths, input_dict):
+    """
+    :param paths:
+    :param input_dict:
+    :return:
+    """
     minterms = []
     flatten = []
     for path in paths:
@@ -92,10 +102,10 @@ def main():
     believedecisive, t, total = autodebug.run(filename, input_dict, ['result'])
     if _tree.get_depth(t) > 0:
         keys = input_dict.keys()
-        goodpaths, badpaths, input_dict = findallpaths(t, keys)
+        goodpaths, badpaths, input_dict = find_all_paths(t, keys)
         minterms, flatten = from_paths_to_binary(badpaths, input_dict)
         if 0 < len(flatten) < 10:
-            s = reduce(len(flatten), minterms)
+            s = reduce_terms(len(flatten), minterms)
             results = []
             for prime in s:
                 result = []

@@ -35,83 +35,114 @@
 import itertools
 import random
 
+"""
+"""
 
-def create_rows(n, m, keys):
+def create_rows(num_params, num_values, keys):
+    """
+    :param num_params:
+    :param num_values:
+    :param keys:
+    :return:
+    """
     rows = []
-    for i in range(n * m):
+    for i in range(num_params * num_values):
         rows.append(dict.fromkeys(keys))
     return rows
 
 
-def fit(v0, v1, pair, rows, keys):
-    if any((d[pair[0]] == v0 and d[pair[1]] == v1) for d in rows): return
-    for d in rows:
-        if d[pair[0]] == v0 and d[pair[1]] == None:
-            d[pair[1]] = v1
+def fit(v_0, v_1, pair, rows, keys):
+    """
+    :param v_0:
+    :param v_1:
+    :param pair:
+    :param rows:
+    :param keys:
+    :return:
+    """
+    if any((data[pair[0]] == v_0 and data[pair[1]] == v_1) for data in rows):
+        return
+    for data in rows:
+        if data[pair[0]] == v_0 and data[pair[1]] is None:
+            data[pair[1]] = v_1
             return
-        if d[pair[0]] == None and d[pair[1]] == v1:
-            d[pair[0]] = v0
+        if data[pair[0]] is None and data[pair[1]] is v_1:
+            data[pair[0]] = v_0
             return
-        if d[pair[0]] == None and d[pair[1]] == None:
-            d[pair[0]] = v0
-            d[pair[1]] = v1
+        if data[pair[0]] is None and data[pair[1]] is None:
+            data[pair[0]] = v_0
+            data[pair[1]] = v_1
             return
     rows.append(dict.fromkeys(keys))
-    rows[-1][pair[0]] = v0
-    rows[-1][pair[1]] = v1
+    rows[-1][pair[0]] = v_0
+    rows[-1][pair[1]] = v_1
 
 
 def all_disjoint_pairs(lst):
+    """
+    :param lst:
+    :return:
+    """
     if len(lst) < 2:
         yield lst
         return
-    a = lst[0]
+    a_member = lst[0]
     for i in range(1, len(lst)):
-        pair = (a, lst[i])
+        pair = (a_member, lst[i])
         for rest in all_disjoint_pairs(lst[1:i] + lst[i + 1:]):
             yield [pair] + rest
 
 
-def get_disjoint_pairs_with_max(keys, max0, max1):
+def get_disjoint_pairs_with_max(keys, max_0, max_1):
+    """
+    :param keys:
+    :param max_0:
+    :param max_1:
+    :return:
+    """
     for disjoint_pairs in all_disjoint_pairs(keys):
-        if ((max0, max1) in disjoint_pairs) or ((max1, max0) in disjoint_pairs):
+        if ((max_0, max_1) in disjoint_pairs) or ((max_1, max_0) in disjoint_pairs):
             return disjoint_pairs
 
 
 def generate_tuples(parameters):
-    if (len(parameters.keys()) % 2 != 0):
+    """
+    :param parameters:
+    :return:
+    """
+    if len(parameters.keys()) % 2 != 0:
         parameters['dummy'] = []
     keys = parameters.keys()
-    max0 = keys[0]
-    max1 = keys[1]
+    max_0 = keys[0]
+    max_1 = keys[1]
     for key in keys[1:]:
-        if len(parameters[key]) >= len(parameters[max0]):
-            max1 = max0
-            max0 = key
-        elif len(parameters[key]) > len(parameters[max1]):
-            max1 = key
+        if len(parameters[key]) >= len(parameters[max_0]):
+            max_1 = max_0
+            max_0 = key
+        elif len(parameters[key]) > len(parameters[max_1]):
+            max_1 = key
 
-    handled_pairs = get_disjoint_pairs_with_max(keys, max0, max1)
-    rows = create_rows(len(parameters[max0]), len(parameters[max1]), keys)
+    handled_pairs = get_disjoint_pairs_with_max(keys, max_0, max_1)
+    rows = create_rows(len(parameters[max_0]), len(parameters[max_1]), keys)
     for pair in handled_pairs:
         row_index = 0
-        for v0 in parameters[pair[0]]:
-            for v1 in parameters[pair[1]]:
-                rows[row_index][pair[0]] = v0
-                rows[row_index][pair[1]] = v1
+        for v_0 in parameters[pair[0]]:
+            for v_1 in parameters[pair[1]]:
+                rows[row_index][pair[0]] = v_0
+                rows[row_index][pair[1]] = v_1
                 row_index += 1
 
     pairs = list(itertools.combinations(keys, 2))
     for pair in pairs:
         if pair not in handled_pairs:
-            for v0 in parameters[pair[0]]:
-                for v1 in parameters[pair[1]]:
-                    fit(v0, v1, pair, rows, keys)
+            for v_0 in parameters[pair[0]]:
+                for v_1 in parameters[pair[1]]:
+                    fit(v_0, v_1, pair, rows, keys)
             handled_pairs.append(pair)
     parameters.pop('dummy', None)
     for row in rows:
         row.pop('dummy', None)
         for key in parameters.keys():
-            if (row[key] == None):
+            if row[key] is None:
                 row[key] = random.choice(list(parameters[key]))
     return rows
