@@ -28,6 +28,7 @@ if sys.version_info < (2, 7):
 setup(name='MLDebugger',
       version='0.1',
       packages=['mldebugger'],
+      python_requires="==2.7",
       entry_points={
           'console_scripts': [
               'mldebugger = mldebugger.run:main',
