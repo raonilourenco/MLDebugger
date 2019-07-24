@@ -21,7 +21,8 @@ req = ['numpy',
        'vistrails==2.2.4',
        'nose==1.3.7',
        'pandas==0.24.0',
-       'scipy == 0.19.1']
+       'scipy == 0.19.1',
+       'Django == 1.11.22']
 
 if sys.version_info < (2, 7):
     req.append('argparse')
