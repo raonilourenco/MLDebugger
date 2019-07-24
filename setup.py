@@ -20,7 +20,7 @@ req = ['numpy',
        'sklearn==0.0',
        'vistrails==2.2.4',
        'nose==1.3.7',
-       'pandas']
+       'pandas==0.24.0']
 
 if sys.version_info < (2, 7):
     req.append('argparse')
@@ -28,7 +28,6 @@ if sys.version_info < (2, 7):
 setup(name='MLDebugger',
       version='0.1',
       packages=['mldebugger'],
-      python_requires="==2.7",
       entry_points={
           'console_scripts': [
               'mldebugger = mldebugger.run:main',
