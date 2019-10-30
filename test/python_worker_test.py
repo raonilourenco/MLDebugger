@@ -23,7 +23,7 @@ class TestPythonWorker:
 
         conf = [0,1,2]
         inputs = ['p0','p1','p2']
-        filename = 'test_diagnosis.vt'
+        filename = 'test/test_diagnosis.vt'
         outputs = ['result']
 
         message = '|'.join([str(filename),str(conf),str(inputs),str(outputs)])
