@@ -33,7 +33,8 @@ setup(name='MLDebugger',
       entry_points={
           'console_scripts': [
               'mldebugger = mldebugger.run:main',
-              'worker = mldebugger.workers.vistrails_worker']},
+              'worker = mldebugger.workers.vistrails_worker',
+              'python_worker = mldebugger.workers.python_worker']},
       install_requires=req,
       description="MlDebugger library",
       author="Raoni Lourenco",

@@ -243,4 +243,3 @@ def record_python_run(paramDict, vistrail_name, origin=None):
     f = open(file_name, "a")
     f.write(json.dumps(paramDict) + '\n')
     f.close()
-    print(permutation)

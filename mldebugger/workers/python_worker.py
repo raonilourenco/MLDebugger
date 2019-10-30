@@ -58,6 +58,8 @@ sender.connect("tcp://{0}:{1}".format(HOST, SEND))
 # Process tasks forever
 while True:
     data = receiver.recv()
+    if data == 'kill':
+        break
     fields = data.split("|")
     filename = fields[0]
     parameter_list = ast.literal_eval(fields[1])
