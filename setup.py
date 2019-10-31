@@ -7,7 +7,7 @@ import sys
 os.chdir(os.path.abspath(os.path.dirname(__file__)))
 
 packages = []
-for rootdir, dirs, files in os.walk('.'):
+for rootdir, dirs, files in os.walk('mldebugger'):
     if '__init__.py' in files:
         packages.append(rootdir.replace('\\', '.').replace('/', '.'))
 
