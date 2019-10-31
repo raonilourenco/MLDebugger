@@ -32,5 +32,6 @@ install:
 - pip install -e .
 
 script:
+- mldebugger --help
 - python_worker &
 - pytest $PACKAGENAME
