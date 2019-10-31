@@ -1,4 +1,4 @@
-# MLDebugger [![Build Status](https://travis-ci.com/raonilourenco/MLDebugger.svg?branch=master)](https://travis-ci.com/raonilourenco/MLDebugger)
+# MLDebugger [![Build Status](https://travis-ci.com/raonilourenco/MLDebugger.svg?branch=migrate_python_3)](https://travis-ci.com/raonilourenco/MLDebugger)
 
 MLDebugger is a framework for finding root causes of erros in machine learning pipelines. For more detailed information about the framework, please refer to our DEEM paper:
 
