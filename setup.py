@@ -11,7 +11,7 @@ for rootdir, dirs, files in os.walk('mldebugger'):
     if '__init__.py' in files:
         packages.append(rootdir.replace('\\', '.').replace('/', '.'))
 
-req = ['coverage',
+req = ['pytest-cov',
        'pylint',
        'numpy',
        'zmq',
