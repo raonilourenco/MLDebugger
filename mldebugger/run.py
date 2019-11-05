@@ -119,8 +119,10 @@ def main():
                                     isinstance(flatten[i][1], str) or isinstance(flatten[i][1], unicode)) else '<'
                         result.append((keys[flatten[i][0]], comparator, str(flatten[i][1])))
                 results.append(result)
-            print '\nRoot causes:\n\n %s' % (' \n OR: '.join([' AND '.join([triple[0] +triple[1]+triple[2]for triple in result]) for result in results]))
+            believedecisive = '\nRoot causes:\n\n %s' % (' \n OR: '.join([' AND '.join([triple[0] +triple[1]+triple[2] for triple in result]) for result in results]))
+            print believedecisive
         else:
             print str(believedecisive)
     else:
         print str(believedecisive)
+    return believedecisive
