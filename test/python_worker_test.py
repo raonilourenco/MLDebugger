@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import os
 import pytest
 import time
@@ -5,7 +7,7 @@ import zmq
 
 
 @pytest.mark.incremental
-class TestPythonWorker:
+class TestPythonWorker(object):
 
 
 
@@ -32,7 +34,7 @@ class TestPythonWorker:
         if socks:
              if socks.get(receiver) == zmq.POLLIN:
                  msg = receiver.recv(zmq.NOBLOCK)
-                 assert msg == "[0, 1, 2, 'False']"
+                 assert msg.decode() == "[0, 1, 2, 'False']"
         time.sleep(1)
         sender.send_string('kill')
 
@@ -64,7 +66,7 @@ class TestPythonWorker:
         if socks:
              if socks.get(receiver) == zmq.POLLIN:
                  msg = receiver.recv(zmq.NOBLOCK)
-                 assert msg == "[0, 0, 2, 'True']"
+                 assert msg.decode() == "[0, 0, 2, 'True']"
 
         time.sleep(1)
         sender.send_string('kill')

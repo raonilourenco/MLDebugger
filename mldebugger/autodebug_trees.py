@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ###############################################################################
 ##
 ## Copyright (C) 2018-2020, New York University.
@@ -31,15 +32,22 @@
 ## ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 ##
 ###############################################################################
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import object
+from six import string_types
 import ast
 import copy
-import Queue
+import queue
 import logging
 import time
 import zmq
 
-import tree
-from utils import load_runs, compute_score, numtests, load_combinatorial, load_permutations
+from . import tree
+from .utils import load_runs, compute_score, numtests, load_combinatorial, load_permutations
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
@@ -53,15 +61,15 @@ class AutoDebug(object):
             path.append((node.col, node.value, True))
             self.determinenodepurity(node.fb, pathfalse)
             self.determinenodepurity(node.tb, path)
-        elif (len(node.results.items()) > 1):
+        elif (len(list(node.results.items())) > 1):
             self.mixedlist.append(path)
-        elif (node.results.items()[0][0]):
+        elif (list(node.results.items())[0][0]):
             self.puregoodlist.append(path)
         else:
             self.purebadlist.append(path)
 
     def findshoertestpaths(self, node):
-        q = Queue.Queue()
+        q = queue.Queue()
         q.put((node, []))
         puregoodpath = None
         purebadpath = None
@@ -70,16 +78,16 @@ class AutoDebug(object):
             if current[0].results is None:
                 q.put((current[0].fb, current[1] + [(current[0].col, current[0].value, False)]))
                 q.put((current[0].tb, current[1] + [(current[0].col, current[0].value, True)]))
-            elif (len(current[0].results.items()) > 1):
+            elif (len(list(current[0].results.items())) > 1):
                 continue
-            elif (current[0].results.items()[0][0]) and (puregoodpath is None):
+            elif (list(current[0].results.items())[0][0]) and (puregoodpath is None):
                 puregoodpath = current[1]
-            elif (not current[0].results.items()[0][0]) and (purebadpath is None):
+            elif (not list(current[0].results.items())[0][0]) and (purebadpath is None):
                 purebadpath = current[1]
         return [puregoodpath, purebadpath]
 
     def findallpaths(self, node):
-        q = Queue.Queue()
+        q = queue.Queue()
         q.put((node, []))
         puregoodpaths = []
         purebadpaths = []
@@ -91,11 +99,11 @@ class AutoDebug(object):
                 value = current[0].value
                 q.put((current[0].fb, current[1] + [(key, value, False)]))
                 q.put((current[0].tb, current[1] + [(key, value, True)]))
-            elif (len(current[0].results.items()) > 1):
+            elif (len(list(current[0].results.items())) > 1):
                 continue
-            elif (current[0].results.items()[0][0]):
+            elif (list(current[0].results.items())[0][0]):
                 puregoodpaths.append(current[1])
-            elif (not current[0].results.items()[0][0]):
+            elif (not list(current[0].results.items())[0][0]):
                 purebadpaths.append(current[1])
         return [puregoodpaths, purebadpaths]
 
@@ -125,19 +133,19 @@ class AutoDebug(object):
 
     def assembletests(self, moralflag, path):
         outlist = []
-        myarrtrans = zip(*self.allexperiments)
+        myarrtrans = list(zip(*self.allexperiments))
 
         input_dict = {}
         for j in range(len(self.cols) - 1):
             y = set(myarrtrans[j])
             for index, value, flag in [tup for tup in path if tup[0] == j]:
                 if flag:
-                    if isinstance(value, str):
+                    if isinstance(value, string_types):
                         y = {value}
                     else:
                         y = {element for element in y if element >= value}
                 else:
-                    if isinstance(value, str):
+                    if isinstance(value, string_types):
                         y = y - {value}
                     else:
                         y = {element for element in y if element < value}
@@ -188,7 +196,7 @@ class AutoDebug(object):
             if socks:
                 if socks.get(self.receiver) == zmq.POLLIN:
                     msg = self.receiver.recv(zmq.NOBLOCK)
-                    exp = ast.literal_eval(msg)
+                    exp = ast.literal_eval(msg.decode())
                     self.allexperiments.append(exp)
                     result_value = exp[-1]
                     for i in range(len(self.my_inputs)):
@@ -228,7 +236,7 @@ class AutoDebug(object):
             return False
 
     def run(self, filename, input_dict, outputs):
-        self.my_inputs = input_dict.keys()
+        self.my_inputs = list(input_dict.keys())
         self.my_outputs = outputs
         self.filename = filename
         self.allexperiments, self.allresults, self.pv_goodness = load_runs(filename.replace(".vt", ".adb"),
@@ -259,7 +267,7 @@ class AutoDebug(object):
             if socks:
                 if socks.get(self.receiver) == zmq.POLLIN:
                     msg = self.receiver.recv(zmq.NOBLOCK)
-                    exp = ast.literal_eval(msg)
+                    exp = ast.literal_eval(msg.decode())
                     self.allexperiments.append(exp)
                     result_value = exp[-1]
                     for i in range(len(self.my_inputs)):

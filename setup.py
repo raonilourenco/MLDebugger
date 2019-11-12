@@ -13,6 +13,7 @@ for rootdir, dirs, files in os.walk('mldebugger'):
 
 req = ['pytest-cov',
        'pylint',
+       'future',
        'numpy',
        'zmq',
        'certifi>=2017.4.17',

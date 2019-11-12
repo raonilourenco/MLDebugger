@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import argparse
 import ast
 import sys
@@ -57,7 +60,7 @@ sender.connect("tcp://{0}:{1}".format(HOST, SEND))
 
 # Process tasks forever
 while True:
-    data = receiver.recv()
+    data = receiver.recv().decode()
     if data == 'kill':
         break
     fields = data.split("|")
@@ -70,11 +73,11 @@ while True:
     diag = ast.literal_eval(f.read())
     f.close()
 
-    kwargs = {}
+    kw_args = {}
     for i in range(len(parameter_list)):
-        kwargs[inputs[i]] = parameter_list[i]
+        kw_args[inputs[i]] = parameter_list[i]
     try:
-        result = workflow_function(kwargs, diag)
+        result = workflow_function(kw_args, diag)
         parameter_list.append(str(result))
 
     except:
@@ -84,9 +87,9 @@ while True:
         print("-" * 60)
         parameter_list.append(str(False))
 
-    kwargs['result'] = parameter_list[-1]
+    kw_args['result'] = parameter_list[-1]
     origin = None
     if len(fields) == 5:
         origin = fields[4]
-    record_python_run(kwargs, filename, origin=origin)
+    record_python_run(kw_args, filename, origin=origin)
     sender.send_string(str(parameter_list))
