@@ -32,6 +32,7 @@
 ##
 ###############################################################################
 
+from builtins import range
 import itertools
 import random
 
@@ -110,9 +111,9 @@ def generate_tuples(parameters):
     :param parameters:
     :return:
     """
-    if len(parameters.keys()) % 2 != 0:
+    if len(list(parameters.keys())) % 2 != 0:
         parameters['dummy'] = []
-    keys = parameters.keys()
+    keys = list(parameters.keys())
     max_0 = keys[0]
     max_1 = keys[1]
     for key in keys[1:]:
@@ -142,7 +143,7 @@ def generate_tuples(parameters):
     parameters.pop('dummy', None)
     for row in rows:
         row.pop('dummy', None)
-        for key in parameters.keys():
+        for key in list(parameters.keys()):
             if row[key] is None:
                 row[key] = random.choice(list(parameters[key]))
     return rows

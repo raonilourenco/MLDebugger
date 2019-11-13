@@ -31,13 +31,19 @@
 ## ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 ##
 ###############################################################################
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
 import copy
 import json
 import logging
 import os
 from mldebugger.combinatorial_design import generate_tuples
-from vistrails.core.modules.module_registry import get_module_registry
+
+
+
 
 goodbad = [True, False]
 numtests = 30
@@ -110,7 +116,7 @@ def load_runs(filename, input_keys, lims=None):
         try:
             exp = []
             exp_dict = json.loads(e[:-1])
-            if type(exp_dict['result']) == unicode:
+            if type(exp_dict['result']) == str:
                 result_value = exp_dict['result'].encode("utf-8")
             else:
                 result_value = exp_dict['result']
@@ -119,7 +125,7 @@ def load_runs(filename, input_keys, lims=None):
                 if key not in pv_goodness:
                     pv_goodness[key] = {}
 
-                if type(exp_dict[key]) == unicode:
+                if type(exp_dict[key]) == str:
                     v = exp_dict[key].encode("utf-8")
                 else:
                     v = exp_dict[key]
@@ -162,7 +168,7 @@ def load_dataxray(filename, input_keys, lims=None):
     count_error = 0
     if lims is None:
         lims = [0, len(alllines)]
-    print('limits', str(lims))
+    print(('limits', str(lims)))
     for e in alllines[lims[0]:lims[1]]:
         try:
             exp_dict = json.loads(e[:-1])
@@ -171,7 +177,7 @@ def load_dataxray(filename, input_keys, lims=None):
             if not result:
                 count_error += 1
             for key in input_keys:
-                if type(exp_dict[key]) == unicode:
+                if type(exp_dict[key]) == str:
                     v = exp_dict[key].encode("utf-8")
                 else:
                     v = exp_dict[key]
@@ -189,14 +195,14 @@ def load_combinatorial(input_dict):
 
 
 def _iterate_over_keys(permutations, current_permutation, input_dict):
-    key = current_permutation.keys()[-1]
-    if key == input_dict.keys()[-1]:
+    key = list(current_permutation.keys())[-1]
+    if key == list(input_dict.keys())[-1]:
         for value in input_dict[key]:
             current_permutation[key] = value
             permutation = copy.deepcopy(current_permutation)
             permutations.append(permutation)
     else:
-        current_permutation[input_dict.keys()[len(current_permutation.keys())]] = None
+        current_permutation[list(input_dict.keys())[len(list(current_permutation.keys()))]] = None
         for value in input_dict[key]:
             current_permutation[key] = value
             permutation = copy.deepcopy(current_permutation)
@@ -205,23 +211,24 @@ def _iterate_over_keys(permutations, current_permutation, input_dict):
 
 def load_permutations(input_dict):
     permutations = []
-    current_permutation = {input_dict.keys()[0]: None}
+    current_permutation = {list(input_dict.keys())[0]: None}
     _iterate_over_keys(permutations, current_permutation, input_dict)
     return permutations
 
 
 def record_run(moduleInfo, result):
+    from vistrails.core.modules.module_registry import get_module_registry
     paramDict = {}
     vistrail_name = moduleInfo['locator'].name
     file_name = vistrail_name.replace('.vt', '.adb')
     f = open(file_name, "a")
     reg = get_module_registry()
     pipeline = moduleInfo['pipeline']
-    sortedModules = sorted(pipeline.modules.iteritems(),
+    sortedModules = sorted(iter(pipeline.modules.items()),
                            key=lambda item: item[1].name)
     for mId, module in sortedModules:
         if len(module.functions) > 0:
-            for fId in xrange(len(module.functions)):
+            for fId in range(len(module.functions)):
                 function = module.functions[fId]
                 desc = reg.get_descriptor_by_name('org.vistrails.vistrails.basic', 'OutputPort')
                 if module.module_descriptor is desc: continue
@@ -241,5 +248,5 @@ def record_python_run(paramDict, vistrail_name, origin=None):
         paramDict["origin"] = origin
     file_name = vistrail_name.replace('.vt', '.adb')
     f = open(file_name, "a")
-    f.write(json.dumps(paramDict) + '\n')
+    f.write(json.dumps(str(paramDict)) + '\n')
     f.close()

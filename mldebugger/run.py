@@ -1,7 +1,12 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import argparse
 import ast
 import itertools
-import Queue
+import queue
 import mldebugger.tree as _tree
 from mldebugger.quine_mccluskey import reduce_terms
 from mldebugger.autodebug_trees import AutoDebug
@@ -13,7 +18,7 @@ def find_all_paths(node, keys):
     :param keys:
     :return:
     """
-    q = Queue.Queue()
+    q = queue.Queue()
     q.put((node, []))
     puregoodpaths = []
     purebadpaths = []
@@ -32,11 +37,11 @@ def find_all_paths(node, keys):
 
             q.put((current[0].fb, current[1] + [(key, value, False)]))
             q.put((current[0].tb, current[1] + [(key, value, True)]))
-        elif (len(current[0].results.items()) > 1):
+        elif (len(list(current[0].results.items())) > 1):
             continue
-        elif (current[0].results.items()[0][0]):
+        elif (list(current[0].results.items())[0][0]):
             puregoodpaths.append(current[1])
-        elif (not current[0].results.items()[0][0]):
+        elif (not list(current[0].results.items())[0][0]):
             purebadpaths.append(current[1])
     return [puregoodpaths, purebadpaths, input_dict]
 
@@ -54,7 +59,7 @@ def from_paths_to_binary(paths, input_dict):
         for triple in path:
             bits_dict[(triple[0], triple[1])] = triple[2]
         path_possibilities = []
-        for param in input_dict.keys():
+        for param in list(input_dict.keys()):
             for value in input_dict[param]:
                 if (param, value) not in flatten:
                     flatten.append((param, value))
@@ -101,7 +106,7 @@ def main():
     autodebug = AutoDebug(**kw_args)
     believedecisive, t, total = autodebug.run(filename, input_dict, ['result'])
     if _tree.get_depth(t) > 0:
-        keys = input_dict.keys()
+        keys = list(input_dict.keys())
         goodpaths, badpaths, input_dict = find_all_paths(t, keys)
         minterms, flatten = from_paths_to_binary(badpaths, input_dict)
         if 0 < len(flatten) < 10:
@@ -112,17 +117,17 @@ def main():
                 for i in range(len(prime)):
                     if prime[i] == '1':
                         comparator = '==' if (
-                                    isinstance(flatten[i][1], str) or isinstance(flatten[i][1], unicode)) else '>='
+                                    isinstance(flatten[i][1], str) or isinstance(flatten[i][1], str)) else '>='
                         result.append((keys[flatten[i][0]], comparator, str(flatten[i][1])))
                     elif prime[i] == '0':
                         comparator = '!=' if (
-                                    isinstance(flatten[i][1], str) or isinstance(flatten[i][1], unicode)) else '<'
+                                    isinstance(flatten[i][1], str) or isinstance(flatten[i][1], str)) else '<'
                         result.append((keys[flatten[i][0]], comparator, str(flatten[i][1])))
                 results.append(result)
             believedecisive = '\nRoot causes:\n\n %s' % (' \n OR: '.join([' AND '.join([triple[0] +triple[1]+triple[2] for triple in result]) for result in results]))
-            print believedecisive
+            print(believedecisive)
         else:
-            print str(believedecisive)
+            print(str(believedecisive))
     else:
-        print str(believedecisive)
+        print(str(believedecisive))
     return believedecisive

@@ -1,6 +1,12 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import next
+from past.builtins import basestring
+from builtins import object
 import vistrails.core.db.action
 
-from itertools import izip
+
 from vistrails.core.modules.module_registry import get_module_registry
 from vistrails.core.vistrail.pipeline import Pipeline as _Pipeline
 from vistrails.core.system import get_vistrails_basic_pkg_id
@@ -104,7 +110,7 @@ class Pipeline(object):
                 sinks.add(arg.module_id)
 
         # Read kwargs
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             name = key
             key = self.get_python_parameter(key)  # Might raise KeyError
             if name in inputs:
@@ -147,7 +153,7 @@ class Pipeline(object):
                 # create_connection = VistrailController.create_connection_static
                 # Fills in the ExternalPipe ports
 
-                for name, input_list in inputs.iteritems():
+                for name, input_list in inputs.items():
                     module_id, values = input_list
                     module = pipeline.modules[module_id]
                     if not isinstance(values, (list, tuple)):
@@ -184,8 +190,8 @@ class Pipeline(object):
                     '''
                     port_spec = reg.get_input_port_spec(module, name)
                     added_functions = {}
-                    tmp_f_id = -1L
-                    tmp_p_id = -1L
+                    tmp_f_id = -1
+                    tmp_p_id = -1
                     function = [f for f in module.functions
                                 if f.name == port_spec.name]
                     if function:
@@ -252,7 +258,7 @@ class Pipeline(object):
             return ExecutionResults(self, result)
 
     def get_module(self, module_id):
-        if isinstance(module_id, (int, long)):  # module id
+        if isinstance(module_id, int):  # module id
             module = self.pipeline.modules[module_id]
         elif isinstance(module_id, basestring):  # module name
             def desc(mod):
@@ -262,7 +268,7 @@ class Pipeline(object):
                     return None
 
             modules = [mod
-                       for mod in self.pipeline.modules.itervalues()
+                       for mod in self.pipeline.modules.values()
                        if desc(mod) == module_id]
             if not modules:
                 raise KeyError("No module with description %r" % module_id)
@@ -285,7 +291,7 @@ class Pipeline(object):
             'org.vistrails.vistrails.basic',
             module_name)
         modules = {}
-        for module in self.pipeline.modules.itervalues():
+        for module in self.pipeline.modules.values():
             if module.module_descriptor is desc:
                 name = get_inputoutput_name(module)
                 if name is not None:
@@ -298,7 +304,7 @@ class Pipeline(object):
             desc = reg.get_descriptor_by_name(
                 'org.vistrails.vistrails.basic',
                 'PythonSource')
-            for module in self.pipeline.modules.itervalues():
+            for module in self.pipeline.modules.values():
                 if module.module_descriptor is desc:
                     for function in module.input_port_specs:
                         if function.name == parameter_name:
@@ -331,13 +337,13 @@ class Pipeline(object):
     @property
     def inputs(self):
         if self._inputs is None:
-            self._inputs = self._get_inputs_or_outputs('InputPort').keys()
+            self._inputs = list(self._get_inputs_or_outputs('InputPort').keys())
         return self._inputs
 
     @property
     def outputs(self):
         if self._outputs is None:
-            self._outputs = self._get_inputs_or_outputs('OutputPort').keys()
+            self._outputs = list(self._get_inputs_or_outputs('OutputPort').keys())
         return self._outputs
 
     def __repr__(self):
@@ -357,9 +363,9 @@ class Pipeline(object):
         if self._html is None:
             import cgi
             try:
-                from cStringIO import StringIO
+                from io import StringIO
             except ImportError:
-                from StringIO import StringIO
+                from io import StringIO
 
             self._html = ''
 
@@ -380,14 +386,14 @@ class Pipeline(object):
             modules = dict((mod_id,
                             (dict((n, i) for i, n in enumerate(mod_ports[0])),
                              dict((n, i) for i, n in enumerate(mod_ports[1]))))
-                           for mod_id, mod_ports in modules.iteritems())
+                           for mod_id, mod_ports in modules.items())
 
             # Write out the modules
-            for mod, port_lists in modules.iteritems():
+            for mod, port_lists in modules.items():
                 labels = []
-                for port_type, ports in izip(('in', 'out'), port_lists):
+                for port_type, ports in zip(('in', 'out'), port_lists):
                     label = ('<td port="%s%s">%s</td>' % (port_type, port_num, cgi.escape(port_name))
-                             for port_name, port_num in ports.iteritems())
+                             for port_name, port_num in ports.items())
                     labels.append(''.join(label))
 
                 label = ['<table border="0" cellborder="0" cellspacing="0">']
@@ -451,7 +457,7 @@ class ExecutionErrors(Exception):
         return "Pipeline execution failed: %d error%s:\n%s" % (
             len(self._errors),
             's' if len(self._errors) >= 2 else '',
-            '\n'.join('%d: %s' % p for p in self._errors.iteritems()))
+            '\n'.join('%d: %s' % p for p in self._errors.items()))
 
 
 class ExecutionResults(object):
@@ -495,7 +501,7 @@ class Module(object):
         if 'module_id' and 'pipeline' in kwargs:
             self.module_id = kwargs.pop('module_id')
             self.pipeline = kwargs.pop('pipeline')
-            if not (isinstance(self.module_id, (int, long)) and
+            if not (isinstance(self.module_id, int) and
                     isinstance(self.pipeline, Pipeline)):
                 raise TypeError
         elif 'module_id' in kwargs or 'pipeline' in kwargs:

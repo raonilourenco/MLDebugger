@@ -1,6 +1,11 @@
 # Following blog post at: http://kldavenport.com/pure-python-decision-trees/
 
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
+from builtins import object
 import collections
 from PIL import Image, ImageDraw
 
@@ -39,19 +44,19 @@ def entropy(rows):
     :return:
     """
     from math import log
-    log2 = lambda x: log(x) / log(2)
+    log2 = lambda x: log(x) // log(2)
     results = unique_counts(rows)
 
     # Now calculate the entropy
     ent = 0.0
-    for r in results.keys():
+    for r in list(results.keys()):
         # current probability of class
         p = float(results[r]) / len(rows)
         ent -= p * log2(p)
     return ent
 
 
-class DecisionNode:
+class DecisionNode(object):
     """
 
     """
@@ -66,7 +71,7 @@ class DecisionNode:
         self.parent = parent
 
 
-class Stats:
+class Stats(object):
     """
 
     """
@@ -84,7 +89,7 @@ class Stats:
         if not tree:
             return 0
         if not tree.fb and not tree.tb:
-            if len(tree.results.keys()) == 1:
+            if len(list(tree.results.keys())) == 1:
                 self.pure_nodes += 1
             return 1
         else:
@@ -183,15 +188,15 @@ def print_tree(tree, indent=''):
     """
     # Is this a leaf node?
     if tree.results is not None:
-        print str(tree.results)
+        print(str(tree.results))
     else:
         # Print the criteria
-        print 'Column ' + str(tree.col_str) + ' : ' + str(tree.value) + '? '
+        print('Column ' + str(tree.col_str) + ' : ' + str(tree.value) + '? ')
 
         # Print the branches
-        print indent + 'True->',
+        print(indent + 'True->', end=' ')
         print_tree(tree.tb, indent + '  ')
-        print indent + 'False->',
+        print(indent + 'False->', end=' ')
         print_tree(tree.fb, indent + '  ')
 
 
@@ -228,7 +233,7 @@ def draw_tree(tree, jpeg='tree.jpg'):
     img = Image.new('RGB', (w, h), (255, 255, 255))
     draw = ImageDraw.Draw(img)
 
-    draw_node(draw, tree, w / 2, 20)
+    draw_node(draw, tree, w // 2, 20)
     img.save(jpeg, 'JPEG')
     # img.show()
     # IPython.display.display(IPython.display.Image(filename=jpeg))
@@ -248,8 +253,8 @@ def draw_node(draw, tree, x, y):
         w2 = get_width(tree.tb) * 100
 
         # Determine the total space required by this node
-        left = x - (w1 + w2) / 2
-        right = x + (w1 + w2) / 2
+        left = x - (w1 + w2) // 2
+        right = x + (w1 + w2) // 2
 
         # Draw the condition string
         draw.text((x - 20, y - 10),
@@ -257,14 +262,14 @@ def draw_node(draw, tree, x, y):
                   (0, 0, 0))
 
         # Draw links to the branches
-        draw.line((x, y, left + w1 / 2, y + 100), fill=(255, 0, 0))
-        draw.line((x, y, right - w2 / 2, y + 100), fill=(255, 0, 0))
+        draw.line((x, y, left + w1 // 2, y + 100), fill=(255, 0, 0))
+        draw.line((x, y, right - w2 // 2, y + 100), fill=(255, 0, 0))
 
         # Draw the branch nodes
-        draw_node(draw, tree.fb, left + w1 / 2, y + 100)
-        draw_node(draw, tree.tb, right - w2 / 2, y + 100)
+        draw_node(draw, tree.fb, left + w1 // 2, y + 100)
+        draw_node(draw, tree.tb, right - w2 // 2, y + 100)
     else:
-        txt = ' \n'.join(['%s:%d' % v for v in tree.results.items()])
+        txt = ' \n'.join(['%s:%d' % v for v in list(tree.results.items())])
         draw.text((x - 20, y), txt, (0, 0, 0))
 
 

@@ -43,7 +43,11 @@ Here is the algorithm
 4. Use GA for set cover problem
 
 '''
+from __future__ import division
+from __future__ import print_function
 
+from builtins import map
+from builtins import range
 import itertools
 import numpy as np
 
@@ -91,7 +95,7 @@ def combine_pairs(group, unchecked):
     :return:
     """
     # define length
-    keys = group.keys()
+    keys = list(group.keys())
     l = len(keys) - 1
 
     # create next group
@@ -374,7 +378,7 @@ def reduce_terms(n_var, minterms):
     """
     a = minterms
     # put the numbers in list in int form
-    a = map(int, a)
+    a = list(map(int, a))
 
     # make a group list
     group = {}
@@ -388,7 +392,7 @@ def reduce_terms(n_var, minterms):
                 a[i] = '0' + a[i]
         # if incorrect input
         elif len(a[i]) > n_var:
-            print '\nError : Choose the correct number of variables(bits)\n'
+            print('\nError : Choose the correct number of variables(bits)\n')
             return
         # count the num of 1
         index = a[i].count('1')
