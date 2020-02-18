@@ -2,7 +2,7 @@
 
 MLDebugger is a framework for finding root causes of erros in machine learning pipelines. For more detailed information about the framework, please refer to our DEEM paper:
 
-[*Debugging Machine Learning Pipelines. R. Lourenco, J. Freire, and D. Shasha. In Proceedings of the 3rd International Workshop on Data Management for End-to-End Machine Learning (DEEM),2019*](https://dl.acm.org/citation.cfm?id=3329489)
+[*Debugging Machine Learning Pipelines. R. Lourenco, J. Freire, and D. Shasha. In Proceedings of the 3rd International Workshop on Data Management for End-to-End Machine Learning (DEEM),2019*](https://arxiv.org/abs/2002.04640)
 
 
 The team includes:
