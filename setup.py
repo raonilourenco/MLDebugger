@@ -22,7 +22,7 @@ req = ['numpy',
        'nose==1.3.7',
        'pandas==0.24.0',
        'scipy == 0.19.1',
-       'Django == 3.2.24']
+       'Django == 3.2.25']
 
 if sys.version_info < (2, 7):
     req.append('argparse')
